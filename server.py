@@ -7,7 +7,7 @@ from datetime import datetime
 
 import jinja2
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 ALL_HTTP_METHODS = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"]
 
@@ -70,3 +70,8 @@ async def extra(path: str, request: Request):
         body=repr(body)[2:-1],
     )
     persistence.append(ri)
+    return JSONResponse(
+        content=dict(
+            message=f"check your request at server URL: {app.url_path_for('root')}"
+            )
+        )
