@@ -58,6 +58,8 @@ async def root():
 
 @app.api_route("/{path:path}", methods=ALL_HTTP_METHODS)
 async def extra(path: str, request: Request):
+    if path == 'favicon.ico':
+        return JSONResponse(content=dict(message=f"favicon ignored"))
     body = await request.body()
     ri = RequestInfo(
         timestamp=f"{datetime.now():%Y-%m-%d %H:%M:%S}",
