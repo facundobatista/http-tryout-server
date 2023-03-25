@@ -1,19 +1,18 @@
-# Copyright 2023 Facundo Batista
-# Licensed under the Apache 2.0 License
-# For further info, check https://github.com/facundobatista/http-tryout-server
-
 import dataclasses
+import io
 import json
 import os
 import pathlib
 import pprint
 from datetime import datetime
 
+import hexdump
 import jinja2
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
 ALL_HTTP_METHODS = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"]
+BODY_MAX_LINES_SHOWED = 25
 
 
 @dataclasses.dataclass
@@ -60,6 +59,16 @@ async def root():
     return root_template.render(all_requests=reversed(list(persistence)))
 
 
+def format_body(body):
+    """Convert the body data structure to a binary stream and dump it."""
+    gen = hexdump.hexdump(io.BytesIO(body), result='generator')
+    # Generate the dump as a line's list and slice it to avoid xl dumps.
+    visual = list(gen)[:BODY_MAX_LINES_SHOWED]
+    if len(visual) == BODY_MAX_LINES_SHOWED:
+        visual[-1] = '(truncado...)'
+    return '\n'.join(visual)
+
+
 @app.api_route("/{path:path}", methods=ALL_HTTP_METHODS)
 async def extra(path: str, request: Request):
     if path == 'favicon.ico':
@@ -73,11 +82,11 @@ async def extra(path: str, request: Request):
         http_version=request.scope['http_version'],
         path="/" + path,
         headers=pprint.pformat(dict(request.headers), width=40),
-        body=repr(body)[2:-1],
+        body=format_body(body),
     )
     persistence.append(ri)
     return JSONResponse(
         content=dict(
             message=f"check your request at server URL: {app.url_path_for('root')}"
+            )
         )
-    )
