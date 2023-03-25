@@ -1,13 +1,13 @@
 import dataclasses
-import json
 import io
+import json
 import os
 import pathlib
 import pprint
 from datetime import datetime
 
-import jinja2
 import hexdump
+import jinja2
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
@@ -58,12 +58,16 @@ root_template = environment.get_template("home.html")
 async def root():
     return root_template.render(all_requests=reversed(list(persistence)))
 
+
 def format_body(body):
+    """Convert the body data structure to a binary stream and dump it."""
     gen = hexdump.hexdump(io.BytesIO(body), result='generator')
+    # Generate the dump as a line's list and slice it to avoid xl dumps.
     visual = list(gen)[:BODY_MAX_LINES_SHOWED]
     if len(visual) == BODY_MAX_LINES_SHOWED:
-        visual[-1] = '<truncado...>'
+        visual[-1] = '(truncado...)'
     return '\n'.join(visual)
+
 
 @app.api_route("/{path:path}", methods=ALL_HTTP_METHODS)
 async def extra(path: str, request: Request):
