@@ -57,7 +57,7 @@ root_template = environment.get_template("home.html")
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    return root_template.render(all_requests=list(persistence))
+    return root_template.render(all_requests=reversed(list(persistence)))
 
 
 @app.api_route("/{path:path}", methods=ALL_HTTP_METHODS)
