@@ -1,3 +1,7 @@
+# Copyright 2023 Facundo Batista
+# Licensed under the Apache 2.0 License
+# For further info, check https://github.com/facundobatista/http-tryout-server
+
 import dataclasses
 import json
 import os
@@ -53,7 +57,7 @@ root_template = environment.get_template("home.html")
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    return root_template.render(all_requests=list(persistence))
+    return root_template.render(all_requests=reversed(list(persistence)))
 
 
 @app.api_route("/{path:path}", methods=ALL_HTTP_METHODS)
@@ -75,5 +79,5 @@ async def extra(path: str, request: Request):
     return JSONResponse(
         content=dict(
             message=f"check your request at server URL: {app.url_path_for('root')}"
-            )
         )
+    )
