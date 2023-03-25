@@ -80,7 +80,7 @@ async def extra(path: str, request: Request):
         method=request.method,
         scheme=request.scope['scheme'].upper(),
         http_version=request.scope['http_version'],
-        path="/" + path,
+        path="/" + path + "?" + request.url.query,
         headers=pprint.pformat(dict(request.headers), width=40),
         body=format_body(body),
     )
