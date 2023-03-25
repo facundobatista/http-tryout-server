@@ -1,3 +1,7 @@
+# Copyright 2023 Facundo Batista
+# Licensed under the Apache 2.0 License
+# For further info, check https://github.com/facundobatista/http-tryout-server
+
 import dataclasses
 import json
 import os
@@ -73,5 +77,5 @@ async def extra(path: str, request: Request):
     return JSONResponse(
         content=dict(
             message=f"check your request at server URL: {app.url_path_for('root')}"
-            )
         )
+    )
